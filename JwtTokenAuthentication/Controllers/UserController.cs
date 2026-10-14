@@ -21,5 +21,31 @@ namespace JwtTokenAuthentication.Controllers
             var result= await _userData.Register(requestDto);
             return Ok(result);
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequestDto loginRequestDto)
+        {
+            try
+            {
+                var result = await _userData.Login(loginRequestDto);
+
+                return Ok(
+                    new
+                    {
+                        message = "Login Successfully",
+                        token = result.Token,
+                        user = result.User
+                    }
+                    );
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = "Login Failed",
+                    error = ex.Message,
+                });
+            }
+        }
     }
 }
