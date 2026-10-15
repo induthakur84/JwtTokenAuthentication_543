@@ -12,7 +12,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")))
 // Add services to the container.
 
 builder.Services.AddScoped<IUserData, UserData>();
-
+builder.Services.AddScoped<IProductService, ProductService>();
 
 //builder.Services.AddSingleton<UserData>();
 
