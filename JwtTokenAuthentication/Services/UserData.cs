@@ -28,9 +28,17 @@ namespace JwtTokenAuthentication.Services
                 FirstName = userRequestDto.FirstName,
                 LastName = userRequestDto.LastName,
                 Email = userRequestDto.Email,
-                Password = userRequestDto.Password,
-                ConfirmPassword = userRequestDto.ConfirmPassword,
-                Role=userRequestDto.Role,
+
+
+                // we will never save plain password admin
+
+                //Bcrypt.HashPasswordL convert password admin to hash 'akkjsdfjkds#'
+               
+
+
+                Password = BCrypt.Net.BCrypt.HashPassword(userRequestDto.Password),
+                ConfirmPassword = BCrypt.Net.BCrypt.HashPassword(userRequestDto.ConfirmPassword),
+                Role = userRequestDto.Role,
                 UserName = userRequestDto.UserName,
             };
 
@@ -45,13 +53,12 @@ namespace JwtTokenAuthentication.Services
             return new UserResponseDto
             {
 
-                FirstName= userRequestDto.FirstName,
-                LastName= userRequestDto.LastName,
-                Email= userRequestDto.Email,
-                UserName= userRequestDto.UserName,
+                FirstName = userRequestDto.FirstName,
+                LastName = userRequestDto.LastName,
+                Email = userRequestDto.Email,
+                UserName = userRequestDto.UserName,
             };
         }
-
         public async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
         {
            var user= _context.Users.FirstOrDefault(u=>u.UserName==loginRequestDto.UserName);
@@ -59,6 +66,17 @@ namespace JwtTokenAuthentication.Services
             if (user == null)
             {
                 throw new Exception("User not found in the database");
+            }
+
+            //Admin
+
+            // 'adasdgsd'
+            bool isValid= BCrypt.Net.BCrypt.Verify(loginRequestDto.Password,user.Password);
+
+            if (!isValid)
+            {
+
+                throw new Exception("Invalid Password");
             }
 
             var token = GenerateToken(user);
